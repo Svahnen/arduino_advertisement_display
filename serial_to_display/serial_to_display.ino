@@ -1,47 +1,59 @@
-// include the LCD library code:
+// include the library code:
 #include <LiquidCrystal.h>
 
-// initialize the library by associating any needed LCD interface pin
-// with the arduino pin number it is connected to
-const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+char inKey;  //Received from Serial input
+uint8_t Cursor = 0;  //Cursor start position
+uint8_t rows = 2;
+uint8_t columns = 16;
+uint8_t characters; //rows * columns
 
-String inputString = "";         // a String to hold incoming data
-bool stringComplete = false;  // whether the string is complete
+//initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-void setup() {
-  // initialize serial:
-  Serial.begin(9600);
-  // reserve 200 bytes for the inputString:
-  inputString.reserve(200);
-
-  // set up the LCD's number of columns and rows:
+void setup(){
+    //set up the LCD's number of columns and rows: 
   lcd.begin(16, 2);
+  //initialize the serial communications:
+  Serial.begin(9600);
 }
 
-void loop() {  
-  // print the string when a newline arrives:
-  if (stringComplete) {
-    Serial.println(inputString);
+void loop()
+{
+  // when characters arrive over the serial port...
+  if (Serial.available()) {
+    //wait a bit for the entire message to arrive
+    delay(100);
+    //clear the screen
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(inputString);
-    // clear the string:
-    inputString = "";
-    stringComplete = false;
+    Cursor = 0;
+    //read all the available characters
+    while (Serial.available() > 0) {
+      //display each character to the LCD
+      inKey = Serial.read();
+      //only print characters that are not newline
+      if(inKey != '\n') {
+        LCDDisplay(inKey);
+      }
+    }
   }
 }
 
-/*
-  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
-  routine is run between each time loop() runs, so using delay inside loop can
-  delay response. Multiple bytes of data may be available.
-*/
-void serialEvent() {
-  while (Serial.available()) {
-    char inchar = (char)  Serial.read();
-  if (inchar != '\n')  
-    inputString += inchar;
-  if(inchar == '\n') {stringComplete = true;}
-    }
- }
+void LCDDisplay(char character)
+{
+  int currentRow = 0;
+  characters = rows * columns;
+  
+  //If Cursor is beyond screen size, get it right
+  while (Cursor >= characters)
+    Cursor -= characters;
+  while (Cursor < 0)
+    Cursor += characters;
+  
+  if (Cursor >= columns)
+    currentRow = Cursor/columns;
+    
+  lcd.setCursor(Cursor%columns, currentRow);
+  lcd.write(character);
+  
+  Cursor++;
+}
