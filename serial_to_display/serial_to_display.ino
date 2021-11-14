@@ -44,6 +44,7 @@ void loop() {
   // print the string when a newline arrives:
   if (stringComplete) {
     Serial.println(inputString);
+    lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(inputString);
     // clear the string:
