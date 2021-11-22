@@ -5,7 +5,6 @@ char inKey;  //Received from Serial input
 uint8_t Cursor = 0;  //Cursor start position
 uint8_t rows = 2;
 uint8_t columns = 16;
-uint8_t characters; //rows * columns
 
 //initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
@@ -41,14 +40,7 @@ void loop()
 void LCDDisplay(char character)
 {
   int currentRow = 0;
-  characters = rows * columns;
-  
-  //If Cursor is beyond screen size, get it right
-  while (Cursor >= characters)
-    Cursor -= characters;
-  while (Cursor < 0)
-    Cursor += characters;
-  
+
   if (Cursor >= columns)
     currentRow = Cursor/columns;
     
