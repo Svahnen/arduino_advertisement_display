@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 
 char inKey;  //Received from Serial input
-uint8_t Cursor = 0;  //Cursor start position
+uint8_t Cursor; //Current position of cursor on screen
 uint8_t rows = 2;
 uint8_t columns = 16;
 
@@ -10,7 +10,7 @@ uint8_t columns = 16;
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup(){
-    //set up the LCD's number of columns and rows: 
+  //set up the LCD's number of columns and rows: 
   lcd.begin(16, 2);
   //initialize the serial communications:
   Serial.begin(9600);
@@ -24,6 +24,7 @@ void loop()
     delay(100);
     //clear the screen
     lcd.clear();
+    //start printing in top left corner
     Cursor = 0;
     //read all the available characters
     while (Serial.available() > 0) {
